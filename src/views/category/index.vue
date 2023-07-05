@@ -23,17 +23,24 @@
   </div>
   <div class="table-wrap">
     <el-table :data="tableData" style="width: 100%" border stripe>
-      <el-table-column prop="date" label="Date" width="180" />
-      <el-table-column prop="name" label="Name" width="180" />
-      <el-table-column prop="address" label="Address" />
+      <el-table-column prop="name" label="名称" width="180" />
+      <el-table-column prop="description" label="描述" width="180" />
+      <el-table-column prop="status" label="状态" >
+        <template #default="scope">
+          <el-icon><CircleCheckFilled /></el-icon>
+      </template>
+      </el-table-column>
     </el-table>
   </div>
   <EditCategory v-model:visible="editCategoryState.visible" :title="editCategoryState.title" :mode="editCategoryState.mode"></EditCategory>
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import EditCategory from './component/EditCategory.vue';
+import { useAsyncState } from '@vueuse/core';
+import { queryCategoryList } from '@/api/modules/category';
+import {CircleCheckFilled} from '@element-plus/icons-vue'
 
 const formInline = reactive({
   user: '',
@@ -49,29 +56,6 @@ const handleCreate = () => {
     editCategoryState.visible = true
 }
 
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    date: '2016-05-02',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    date: '2016-05-04',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  },
-  {
-    date: '2016-05-01',
-    name: 'Tom',
-    address: 'No. 189, Grove St, Los Angeles'
-  }
-]
-
 const editCategoryState = reactive<{
     visible: boolean
     title: string
@@ -80,6 +64,19 @@ const editCategoryState = reactive<{
     visible: false,
     title: '创建',
     mode: 'create'
+})
+
+const { state, isReady, isLoading } = useAsyncState(
+  queryCategoryList().then(data => data),
+  {}
+)
+
+const tableData = computed(() => {
+  return state.value || []
+})
+
+onMounted(() => {
+  console.log('sss')
 })
 
 </script>
