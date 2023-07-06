@@ -1,5 +1,6 @@
 import axios, { AxiosRequestHeaders } from 'axios';
 import storage from '@/utils/storage';
+import { ElMessage } from 'element-plus';
 
 const toastErrorMsg = (msg: string) => {
 //   toast({
@@ -7,6 +8,7 @@ const toastErrorMsg = (msg: string) => {
 //     status: 'error',
 //     position: 'top'
 //   })
+ElMessage.error({message: msg})
 }
 export const request = axios.create({
   baseURL: 'http://localhost:3000/api/admin',

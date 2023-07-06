@@ -1,20 +1,11 @@
 <template>
   <div class="search-wrap">
-    <el-form :inline="true" :model="formInline" class="">
-      <el-form-item label="Approved by">
-        <el-input v-model="formInline.user" placeholder="Approved by" clearable />
-      </el-form-item>
-      <el-form-item label="Activity zone">
-        <el-select v-model="formInline.region" placeholder="Activity zone" clearable>
-          <el-option label="Zone one" value="shanghai" />
-          <el-option label="Zone two" value="beijing" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="Activity time">
-        <el-date-picker v-model="formInline.date" type="date" placeholder="Pick a date" clearable />
+    <el-form :inline="true" :model="searchForm" class="">
+      <el-form-item label="名称">
+        <el-input v-model="searchForm.name" placeholder="请输入类型名称" clearable />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
+        <el-button type="primary" @click="onSearch">查询</el-button>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="handleCreate">新增</el-button>
@@ -22,67 +13,100 @@
     </el-form>
   </div>
   <div class="table-wrap">
-    <el-table :data="tableData" style="width: 100%" border stripe>
-      <el-table-column prop="name" label="名称" width="180" />
-      <el-table-column prop="description" label="描述" width="180" />
-      <el-table-column prop="status" label="状态" >
-        <template #default="scope">
-          <el-icon><CircleCheckFilled /></el-icon>
-      </template>
+    <el-table :data="tableData" style="width: 100%" border stripe v-loading="isLoading">
+      <el-table-column prop="name" label="名称"/>
+      <el-table-column prop="description" label="描述"/>
+      <el-table-column prop="status" label="状态">
+        <template #default="{ row }">
+          <el-icon><CircleCheckFilled :color="row.status === 1 ? '#67C23A' : ''"/></el-icon>
+        </template>
+      </el-table-column>
+      <el-table-column prop="action" label="操作">
+        <template #default="{ row }">
+          
+          <el-icon @click="() => handleDelete(row)"><DeleteFilled/></el-icon>
+          <el-icon @click="() =>handleEdit(row)"><Edit/></el-icon>
+        </template>
       </el-table-column>
     </el-table>
   </div>
-  <EditCategory v-model:visible="editCategoryState.visible" :title="editCategoryState.title" :mode="editCategoryState.mode"></EditCategory>
+  <EditCategory
+    v-model:visible="editCategoryState.visible"
+    :title="editCategoryState.title"
+    :mode="editCategoryState.mode"
+    :id="editCategoryState.id"
+    @submit-success="handleSubmitSuccess"
+  ></EditCategory>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive } from 'vue'
-import EditCategory from './component/EditCategory.vue';
-import { useAsyncState } from '@vueuse/core';
-import { queryCategoryList } from '@/api/modules/category';
-import {CircleCheckFilled} from '@element-plus/icons-vue'
+import { computed, onMounted, reactive, watch } from 'vue'
+import EditCategory from './component/EditCategory.vue'
+import { useAsyncState } from '@vueuse/core'
+import { deleteCategory, queryCategoryList } from '@/api/modules/category'
+import { CircleCheckFilled, DeleteFilled, Edit } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
-const formInline = reactive({
-  user: '',
-  region: '',
-  date: ''
+const searchForm = reactive({
+  name: ''
 })
 
-const onSubmit = () => {
-  console.log('submit!')
+const onSearch = () => {
+  getTableList()
 }
 
 const handleCreate = () => {
-    editCategoryState.visible = true
+  editCategoryState.visible = true
+  editCategoryState.title = '创建分类'
+  editCategoryState.mode = 'create'
+  editCategoryState.id = ''
 }
 
 const editCategoryState = reactive<{
-    visible: boolean
-    title: string
-    mode: 'create' | 'update' | 'detail'
+  visible: boolean
+  title: string
+  mode: 'create' | 'update' | 'detail'
+  id: string
 }>({
-    visible: false,
-    title: '创建',
-    mode: 'create'
+  visible: false,
+  title: '创建',
+  mode: 'create',
+  id: ''
 })
 
-const { state, isReady, isLoading } = useAsyncState(
-  queryCategoryList().then(data => data),
-  {}
-)
+const {
+  state: tableData,
+  isReady,
+  isLoading,
+  execute: getTableList
+} = useAsyncState(() => queryCategoryList({ name: searchForm.name }), [], { resetOnExecute: true })
 
-const tableData = computed(() => {
-  return state.value || []
-})
+const handleDelete = (row) => {
+  ElMessageBox.confirm("确认删除", "提醒").then(async() => {
+    await deleteCategory({id: row.id})
+    ElMessage.success("删除成功")
+    getTableList()
+  })
+}
+const handleEdit = (row) => {
+  editCategoryState.title = '编辑类型'
+  editCategoryState.mode = 'update'
+  editCategoryState.id = row.id
+  editCategoryState.visible = true
+}
+
+const handleSubmitSuccess = () => {
+  console.log('ssssss')
+  getTableList()
+}
 
 onMounted(() => {
   console.log('sss')
 })
-
 </script>
 <style lang="scss" scoped>
 .search-wrap {
-//   margin-bottom: 12px;
-//   border-bottom: 1px solid #f0f2f5;
+  //   margin-bottom: 12px;
+  //   border-bottom: 1px solid #f0f2f5;
 }
 </style>
