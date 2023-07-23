@@ -1,42 +1,43 @@
 <template>
-  <div class="search-wrap">
-    <el-form :inline="true" :model="searchForm" class="">
-      <el-form-item label="名称">
-        <el-input v-model="searchForm.name" placeholder="请输入类型名称" clearable />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSearch">查询</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleCreate">新增</el-button>
-      </el-form-item>
-    </el-form>
+  <div class="page">
+    <div class="search-wrap">
+      <el-form :inline="true" :model="searchForm" class="">
+        <el-form-item label="名称">
+          <el-input v-model="searchForm.name" placeholder="请输入类型名称" clearable />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSearch">查询</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="handleCreate">新增</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div class="table-wrap">
+      <el-table :data="tableData" style="width: 100%" border stripe v-loading="isLoading">
+        <el-table-column prop="name" label="名称" />
+        <el-table-column prop="description" label="描述" />
+        <el-table-column prop="status" label="状态">
+          <template #default="{ row }">
+            <el-icon><CircleCheckFilled :color="row.status === 1 ? '#67C23A' : ''" /></el-icon>
+          </template>
+        </el-table-column>
+        <el-table-column prop="action" label="操作">
+          <template #default="{ row }">
+            <el-icon @click="() => handleDelete(row)"><DeleteFilled /></el-icon>
+            <el-icon @click="() => handleEdit(row)"><Edit /></el-icon>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <EditCategory
+      v-model:visible="editCategoryState.visible"
+      :title="editCategoryState.title"
+      :mode="editCategoryState.mode"
+      :id="editCategoryState.id"
+      @submit-success="handleSubmitSuccess"
+    ></EditCategory>
   </div>
-  <div class="table-wrap">
-    <el-table :data="tableData" style="width: 100%" border stripe v-loading="isLoading">
-      <el-table-column prop="name" label="名称"/>
-      <el-table-column prop="description" label="描述"/>
-      <el-table-column prop="status" label="状态">
-        <template #default="{ row }">
-          <el-icon><CircleCheckFilled :color="row.status === 1 ? '#67C23A' : ''"/></el-icon>
-        </template>
-      </el-table-column>
-      <el-table-column prop="action" label="操作">
-        <template #default="{ row }">
-          
-          <el-icon @click="() => handleDelete(row)"><DeleteFilled/></el-icon>
-          <el-icon @click="() =>handleEdit(row)"><Edit/></el-icon>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
-  <EditCategory
-    v-model:visible="editCategoryState.visible"
-    :title="editCategoryState.title"
-    :mode="editCategoryState.mode"
-    :id="editCategoryState.id"
-    @submit-success="handleSubmitSuccess"
-  ></EditCategory>
 </template>
 
 <script lang="ts" setup>
@@ -82,9 +83,9 @@ const {
 } = useAsyncState(() => queryCategoryList({ name: searchForm.name }), [], { resetOnExecute: true })
 
 const handleDelete = (row) => {
-  ElMessageBox.confirm("确认删除", "提醒").then(async() => {
-    await deleteCategory({id: row.id})
-    ElMessage.success("删除成功")
+  ElMessageBox.confirm('确认删除', '提醒').then(async () => {
+    await deleteCategory({ id: row.id })
+    ElMessage.success('删除成功')
     getTableList()
   })
 }

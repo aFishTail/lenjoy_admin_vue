@@ -1,13 +1,7 @@
+import { Category } from '@/model/category'
 import { request } from '../request/index'
 
-interface Category {
-  id: string
-  name: string
-  label: string
-  description: string
-}
-
-export const queryCategoryList = (params: { name: string }) => {
+export const queryCategoryList = (params: { name: string }): Promise<Category[]> => {
   return request({
     url: '/category/list',
     method: 'post',
