@@ -3,7 +3,7 @@ import { request } from '../request/index'
 
 export const queryCategoryList = (params: { name: string }): Promise<Category[]> => {
   return request({
-    url: '/category/list',
+    url: '/api/admin/category/list',
     method: 'post',
     data: params
   })
@@ -11,7 +11,7 @@ export const queryCategoryList = (params: { name: string }): Promise<Category[]>
 
 export const createCategory = (params: Category) => {
   return request({
-    url: '/category/create',
+    url: '/api/admin/category/create',
     method: 'post',
     data: params
   })
@@ -19,21 +19,21 @@ export const createCategory = (params: Category) => {
 
 export const deleteCategory = (params: { id: string }) => {
   return request({
-    url: '/category/delete',
+    url: '/api/admin/category/delete',
     method: 'post',
     data: params
   })
 }
 export const getCategoryDetail = (params: { id: string }): Promise<Category> => {
   return request({
-    url: '/category/detail',
+    url: '/api/admin/category/detail',
     method: 'post',
     data: params
   })
 }
 export const updateCategory = (params: Category) => {
   return request({
-    url: '/category/update',
+    url: '/api/admin/category/update',
     method: 'post',
     data: params
   })

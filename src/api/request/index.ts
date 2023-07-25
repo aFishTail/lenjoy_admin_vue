@@ -11,7 +11,7 @@ const toastErrorMsg = (msg: string) => {
 ElMessage.error({message: msg})
 }
 export const request = axios.create({
-  baseURL: 'http://localhost:3000/api/admin',
+  baseURL: import.meta.env.VITE_APP_API_URL,
   timeout: 60000,
 });
 
