@@ -1,7 +1,7 @@
 import { CreateTopicParam, Topic } from '@/model/topic'
 import { request } from '../request/index'
 
-export const queryTopicList = (params: { name: string, pageNum: number, pageSize: number }): Promise<PageResult<Topic>> => {
+export const queryTopicList = (params: { title: string, pageNum: number, pageSize: number }): Promise<PageResult<Topic>> => {
   return request({
     url: '/api/admin/topic/list',
     method: 'post',

@@ -31,8 +31,9 @@ import { ElMessage, FormInstance, FormRules } from 'element-plus'
 import { queryCategoryList } from '@/api/modules/category'
 import { CreateTopicParam, Topic } from '@/model/topic';
 import Editor from '@/components/Editor.vue'
-import { createTopic, updateTopic } from '@/api/modules/topic';
+import { createTopic, getTopicDetail, updateTopic } from '@/api/modules/topic';
 import { useAsyncState } from '@vueuse/core';
+import {trimText} from '@/utils/dom'
 
 interface IProps {
   visible: boolean
@@ -82,7 +83,7 @@ const submitForm = async (formEl: FormInstance) => {
   await formEl.validate(async (valid, fields) => {
     if (valid) {
       if (props.mode === 'create') {
-        await createTopic({ ...form })
+        await createTopic({ ...form, summary: form.summary || trimText(form.content) })
       ElMessage.success('创建成功')
       } else {
         // await updateCategory({ ...form })
@@ -105,7 +106,7 @@ const handleClose = () => {
 
 const init = async () => {
   if(props.mode === 'update') {
-    const data = await getCategoryDetail({ id: props.id })
+    const data = await getTopicDetail({ id: props.id })
   Object.assign(form, data)
   }
 }

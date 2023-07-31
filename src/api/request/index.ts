@@ -15,7 +15,6 @@ request.interceptors.request.use(
   (config) => {
     if (typeof window !== 'undefined') {
       const token = storage.getItem('token')
-      console.log('token:', token)
       if (token) {
         config.headers!.Authorization = `Bearer ${token}`
       }
